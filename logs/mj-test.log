@@ -1,0 +1,352 @@
+INFO  16:12:17,555 - Compiling source file: C:\Users\kf150605d\Desktop\PP_JUL_NOVO\workspace\MJCompiler\test\program.mj
+INFO  16:12:17,699 - #2 program
+INFO  16:12:17,700 - #9 MJProgram
+INFO  16:12:17,700 - #9 int
+INFO  16:12:17,702 - #9 x
+INFO  16:12:17,705 - #32 ,
+INFO  16:12:17,707 - #9 y
+INFO  16:12:17,708 - #31 ;
+INFO  16:12:17,708 - #9 char
+INFO  16:12:17,712 - #9 c1
+INFO  16:12:17,713 - #32 ,
+INFO  16:12:17,718 - #9 c2
+INFO  16:12:17,718 - #31 ;
+INFO  16:12:17,719 - #5 const
+INFO  16:12:17,719 - #9 int
+INFO  16:12:17,721 - #9 conInt
+INFO  16:12:17,721 - #28 =
+INFO  16:12:17,722 - #10 10
+INFO  16:12:17,722 - #31 ;
+INFO  16:12:17,726 - #5 const
+INFO  16:12:17,729 - #9 char
+INFO  16:12:17,729 - #9 conChr
+INFO  16:12:17,731 - #28 =
+INFO  16:12:17,731 - #11 a
+INFO  16:12:17,732 - #31 ;
+INFO  16:12:17,732 - #9 bool
+INFO  16:12:17,733 - #9 uslov
+INFO  16:12:17,733 - #31 ;
+INFO  16:12:17,733 - #24 {
+INFO  16:12:17,734 - #6 void
+INFO  16:12:17,734 - #9 testAssignArray
+INFO  16:12:17,734 - #33 (
+INFO  16:12:17,743 - #34 )
+INFO  16:12:17,745 - #9 int
+INFO  16:12:17,746 - #9 niz
+INFO  16:12:17,746 - #26 [
+INFO  16:12:17,746 - #27 ]
+INFO  16:12:17,746 - #31 ;
+INFO  16:12:17,747 - #24 {
+INFO  16:12:17,747 - #9 uslov
+INFO  16:12:17,747 - #28 =
+INFO  16:12:17,753 - #8 false
+INFO  16:12:17,755 - #31 ;
+INFO  16:12:17,762 - #3 print
+INFO  16:12:17,764 - #33 (
+INFO  16:12:17,764 - #9 uslov
+INFO  16:12:17,766 - #34 )
+INFO  16:12:17,766 - #31 ;
+INFO  16:12:17,766 - #9 x
+INFO  16:12:17,769 - #28 =
+INFO  16:12:17,770 - #10 3
+INFO  16:12:17,771 - #31 ;
+INFO  16:12:17,771 - #3 print
+INFO  16:12:17,771 - #33 (
+INFO  16:12:17,772 - #9 x
+INFO  16:12:17,772 - #34 )
+INFO  16:12:17,772 - #31 ;
+INFO  16:12:17,772 - #9 niz
+INFO  16:12:17,774 - #28 =
+INFO  16:12:17,774 - #7 new
+INFO  16:12:17,796 - #9 int
+INFO  16:12:17,796 - #26 [
+INFO  16:12:17,797 - #10 4
+INFO  16:12:17,797 - #27 ]
+INFO  16:12:17,797 - #31 ;
+INFO  16:12:17,798 - #9 niz
+INFO  16:12:17,798 - #26 [
+INFO  16:12:17,798 - #10 0
+INFO  16:12:17,798 - #27 ]
+INFO  16:12:17,798 - #28 =
+INFO  16:12:17,798 - #10 10
+INFO  16:12:17,798 - #31 ;
+INFO  16:12:17,799 - #9 niz
+INFO  16:12:17,799 - #26 [
+INFO  16:12:17,799 - #10 1
+INFO  16:12:17,799 - #27 ]
+INFO  16:12:17,799 - #28 =
+INFO  16:12:17,799 - #10 20
+INFO  16:12:17,799 - #31 ;
+INFO  16:12:17,799 - #9 niz
+INFO  16:12:17,799 - #26 [
+INFO  16:12:17,800 - #10 2
+INFO  16:12:17,800 - #27 ]
+INFO  16:12:17,800 - #28 =
+INFO  16:12:17,801 - #10 30
+INFO  16:12:17,801 - #31 ;
+INFO  16:12:17,801 - #9 niz
+INFO  16:12:17,801 - #26 [
+INFO  16:12:17,801 - #10 3
+INFO  16:12:17,801 - #27 ]
+INFO  16:12:17,801 - #28 =
+INFO  16:12:17,802 - #10 40
+INFO  16:12:17,802 - #31 ;
+INFO  16:12:17,802 - #9 niz
+INFO  16:12:17,802 - #26 [
+INFO  16:12:17,802 - #10 0
+INFO  16:12:17,802 - #27 ]
+INFO  16:12:17,802 - #29 ++
+INFO  16:12:17,803 - #31 ;
+INFO  16:12:17,803 - #9 niz
+INFO  16:12:17,803 - #26 [
+INFO  16:12:17,804 - #10 1
+INFO  16:12:17,804 - #27 ]
+INFO  16:12:17,805 - #30 --
+INFO  16:12:17,805 - #31 ;
+INFO  16:12:17,805 - #9 niz
+INFO  16:12:17,805 - #26 [
+INFO  16:12:17,806 - #10 2
+INFO  16:12:17,806 - #27 ]
+INFO  16:12:17,806 - #28 =
+INFO  16:12:17,806 - #9 niz
+INFO  16:12:17,806 - #26 [
+INFO  16:12:17,807 - #10 0
+INFO  16:12:17,807 - #27 ]
+INFO  16:12:17,807 - #31 ;
+INFO  16:12:17,807 - #9 niz
+INFO  16:12:17,807 - #26 [
+INFO  16:12:17,808 - #10 3
+INFO  16:12:17,808 - #27 ]
+INFO  16:12:17,808 - #28 =
+INFO  16:12:17,808 - #9 niz
+INFO  16:12:17,808 - #26 [
+INFO  16:12:17,809 - #10 1
+INFO  16:12:17,809 - #27 ]
+INFO  16:12:17,809 - #31 ;
+INFO  16:12:17,809 - #9 niz
+INFO  16:12:17,810 - #26 [
+INFO  16:12:17,810 - #10 0
+INFO  16:12:17,811 - #27 ]
+INFO  16:12:17,811 - #28 =
+INFO  16:12:17,812 - #10 0
+INFO  16:12:17,812 - #31 ;
+INFO  16:12:17,812 - #9 niz
+INFO  16:12:17,812 - #26 [
+INFO  16:12:17,812 - #10 1
+INFO  16:12:17,812 - #27 ]
+INFO  16:12:17,813 - #28 =
+INFO  16:12:17,813 - #10 1
+INFO  16:12:17,813 - #31 ;
+INFO  16:12:17,813 - #9 niz
+INFO  16:12:17,813 - #26 [
+INFO  16:12:17,814 - #10 2
+INFO  16:12:17,814 - #27 ]
+INFO  16:12:17,814 - #28 =
+INFO  16:12:17,814 - #10 2
+INFO  16:12:17,814 - #31 ;
+INFO  16:12:17,814 - #9 niz
+INFO  16:12:17,814 - #26 [
+INFO  16:12:17,814 - #10 3
+INFO  16:12:17,814 - #27 ]
+INFO  16:12:17,815 - #28 =
+INFO  16:12:17,815 - #10 3
+INFO  16:12:17,815 - #31 ;
+INFO  16:12:17,815 - #9 x
+INFO  16:12:17,815 - #28 =
+INFO  16:12:17,815 - #9 niz
+INFO  16:12:17,815 - #26 [
+INFO  16:12:17,815 - #10 3
+INFO  16:12:17,816 - #27 ]
+INFO  16:12:17,816 - #31 ;
+INFO  16:12:17,816 - #9 x
+INFO  16:12:17,816 - #28 =
+INFO  16:12:17,816 - #9 conInt
+INFO  16:12:17,816 - #31 ;
+INFO  16:12:17,816 - #9 niz
+INFO  16:12:17,817 - #26 [
+INFO  16:12:17,817 - #10 0
+INFO  16:12:17,817 - #27 ]
+INFO  16:12:17,817 - #19 +=
+INFO  16:12:17,817 - #9 niz
+INFO  16:12:17,819 - #26 [
+INFO  16:12:17,819 - #10 1
+INFO  16:12:17,819 - #27 ]
+INFO  16:12:17,819 - #21 *=
+INFO  16:12:17,820 - #9 x
+INFO  16:12:17,821 - #20 -=
+INFO  16:12:17,821 - #9 niz
+INFO  16:12:17,822 - #26 [
+INFO  16:12:17,822 - #10 2
+INFO  16:12:17,823 - #27 ]
+INFO  16:12:17,823 - #16 *
+INFO  16:12:17,823 - #10 5
+INFO  16:12:17,826 - #15 -
+INFO  16:12:17,830 - #10 4
+INFO  16:12:17,833 - #16 *
+INFO  16:12:17,833 - #9 niz
+INFO  16:12:17,833 - #26 [
+INFO  16:12:17,834 - #10 1
+INFO  16:12:17,834 - #27 ]
+INFO  16:12:17,834 - #31 ;
+INFO  16:12:17,840 - #3 print
+INFO  16:12:17,840 - #33 (
+INFO  16:12:17,841 - #9 niz
+INFO  16:12:17,842 - #26 [
+INFO  16:12:17,842 - #10 0
+INFO  16:12:17,842 - #27 ]
+INFO  16:12:17,843 - #34 )
+INFO  16:12:17,843 - #31 ;
+INFO  16:12:17,843 - #3 print
+INFO  16:12:17,843 - #33 (
+INFO  16:12:17,843 - #9 niz
+INFO  16:12:17,843 - #26 [
+INFO  16:12:17,843 - #10 1
+INFO  16:12:17,843 - #27 ]
+INFO  16:12:17,843 - #34 )
+INFO  16:12:17,844 - #31 ;
+INFO  16:12:17,844 - #3 print
+INFO  16:12:17,844 - #33 (
+INFO  16:12:17,844 - #9 x
+INFO  16:12:17,844 - #34 )
+INFO  16:12:17,845 - #31 ;
+INFO  16:12:17,846 - #3 print
+INFO  16:12:17,846 - #33 (
+INFO  16:12:17,846 - #9 niz
+INFO  16:12:17,847 - #26 [
+INFO  16:12:17,847 - #10 2
+INFO  16:12:17,848 - #27 ]
+INFO  16:12:17,848 - #34 )
+INFO  16:12:17,848 - #31 ;
+INFO  16:12:17,849 - #3 print
+INFO  16:12:17,849 - #33 (
+INFO  16:12:17,849 - #9 niz
+INFO  16:12:17,849 - #26 [
+INFO  16:12:17,849 - #10 3
+INFO  16:12:17,850 - #27 ]
+INFO  16:12:17,850 - #34 )
+INFO  16:12:17,850 - #31 ;
+INFO  16:12:17,850 - #4 read
+INFO  16:12:17,850 - #33 (
+INFO  16:12:17,850 - #9 y
+INFO  16:12:17,850 - #34 )
+INFO  16:12:17,850 - #31 ;
+INFO  16:12:17,850 - #3 print
+INFO  16:12:17,851 - #33 (
+INFO  16:12:17,851 - #9 y
+INFO  16:12:17,851 - #34 )
+INFO  16:12:17,851 - #31 ;
+INFO  16:12:17,851 - #4 read
+INFO  16:12:17,851 - #33 (
+INFO  16:12:17,852 - #9 niz
+INFO  16:12:17,852 - #26 [
+INFO  16:12:17,852 - #10 0
+INFO  16:12:17,852 - #27 ]
+INFO  16:12:17,852 - #34 )
+INFO  16:12:17,852 - #31 ;
+INFO  16:12:17,852 - #3 print
+INFO  16:12:17,852 - #33 (
+INFO  16:12:17,852 - #9 niz
+INFO  16:12:17,852 - #26 [
+INFO  16:12:17,853 - #10 0
+INFO  16:12:17,853 - #27 ]
+INFO  16:12:17,853 - #34 )
+INFO  16:12:17,853 - #31 ;
+INFO  16:12:17,853 - #9 x
+INFO  16:12:17,853 - #28 =
+INFO  16:12:17,853 - #9 y
+INFO  16:12:17,854 - #31 ;
+INFO  16:12:17,854 - #9 x
+INFO  16:12:17,854 - #28 =
+INFO  16:12:17,855 - #9 niz
+INFO  16:12:17,855 - #26 [
+INFO  16:12:17,855 - #10 0
+INFO  16:12:17,855 - #27 ]
+INFO  16:12:17,855 - #16 *
+INFO  16:12:17,855 - #10 40
+INFO  16:12:17,855 - #31 ;
+INFO  16:12:17,855 - #9 x
+INFO  16:12:17,856 - #20 -=
+INFO  16:12:17,856 - #9 y
+INFO  16:12:17,856 - #21 *=
+INFO  16:12:17,856 - #9 niz
+INFO  16:12:17,856 - #26 [
+INFO  16:12:17,856 - #10 0
+INFO  16:12:17,856 - #27 ]
+INFO  16:12:17,857 - #31 ;
+INFO  16:12:17,857 - #3 print
+INFO  16:12:17,857 - #33 (
+INFO  16:12:17,857 - #9 y
+INFO  16:12:17,857 - #34 )
+INFO  16:12:17,857 - #31 ;
+INFO  16:12:17,858 - #3 print
+INFO  16:12:17,858 - #33 (
+INFO  16:12:17,858 - #9 x
+INFO  16:12:17,858 - #34 )
+INFO  16:12:17,858 - #31 ;
+INFO  16:12:17,859 - #25 }
+INFO  16:12:17,859 - #9 int
+INFO  16:12:17,860 - #9 main
+INFO  16:12:17,860 - #33 (
+INFO  16:12:17,860 - #34 )
+INFO  16:12:17,861 - #24 {
+INFO  16:12:17,861 - #9 testAssignArray
+INFO  16:12:17,861 - #33 (
+INFO  16:12:17,861 - #34 )
+INFO  16:12:17,861 - #31 ;
+INFO  16:12:17,862 - #40 return
+INFO  16:12:17,862 - #10 0
+INFO  16:12:17,862 - #31 ;
+INFO  16:12:17,862 - #25 }
+INFO  16:12:17,862 - #25 }
+INFO  16:12:17,916 - Pocetak obrade programa MJProgram na liniji 1
+INFO  16:12:17,917 - Pronadjen tip int u tabeli simbola na liniji 2
+INFO  16:12:17,918 - Deklarisana promenljiva x na liniji 2
+INFO  16:12:17,918 - Deklarisana promenljiva y na liniji 2
+INFO  16:12:17,918 - Pronadjen tip char u tabeli simbola na liniji 3
+INFO  16:12:17,918 - Deklarisana promenljiva c1 na liniji 3
+INFO  16:12:17,918 - Deklarisana promenljiva c2 na liniji 3
+INFO  16:12:17,919 - Pronadjen tip int u tabeli simbola na liniji 4
+INFO  16:12:17,919 - Deklarisana konstanta conInt na liniji 4
+INFO  16:12:17,919 - Pronadjen tip char u tabeli simbola na liniji 5
+INFO  16:12:17,919 - Deklarisana konstanta conChr na liniji 5
+INFO  16:12:17,919 - Pronadjen tip bool u tabeli simbola na liniji 6
+INFO  16:12:17,919 - Deklarisana promenljiva uslov na liniji 6
+INFO  16:12:17,921 - Pocetak obrade metode testAssignArray na liniji 9
+INFO  16:12:17,921 - Pronadjen tip int u tabeli simbola na liniji 9
+INFO  16:12:17,921 - Deklarisan niz niz na liniji 9
+INFO  16:12:17,921 - Pronadjen tip int u tabeli simbola na liniji 15
+INFO  16:12:17,922 - Pristup elementu niza niz na liniji 16
+INFO  16:12:17,922 - Pristup elementu niza niz na liniji 17
+INFO  16:12:17,922 - Pristup elementu niza niz na liniji 18
+INFO  16:12:17,922 - Pristup elementu niza niz na liniji 19
+INFO  16:12:17,922 - Pristup elementu niza niz na liniji 21
+INFO  16:12:17,923 - Pristup elementu niza niz na liniji 22
+INFO  16:12:17,923 - Pristup elementu niza niz na liniji 24
+INFO  16:12:17,923 - Pristup elementu niza niz na liniji 24
+INFO  16:12:17,923 - Pristup elementu niza niz na liniji 25
+INFO  16:12:17,927 - Pristup elementu niza niz na liniji 25
+INFO  16:12:17,928 - Pristup elementu niza niz na liniji 27
+INFO  16:12:17,928 - Pristup elementu niza niz na liniji 28
+INFO  16:12:17,928 - Pristup elementu niza niz na liniji 29
+INFO  16:12:17,929 - Pristup elementu niza niz na liniji 30
+INFO  16:12:17,929 - Pristup elementu niza niz na liniji 32
+INFO  16:12:17,929 - Pristup elementu niza niz na liniji 35
+INFO  16:12:17,929 - Pristup elementu niza niz na liniji 35
+INFO  16:12:17,930 - Pristup elementu niza niz na liniji 35
+INFO  16:12:17,930 - Pristup elementu niza niz na liniji 35
+INFO  16:12:17,930 - Pristup elementu niza niz na liniji 37
+INFO  16:12:17,930 - Pristup elementu niza niz na liniji 38
+INFO  16:12:17,930 - Pristup elementu niza niz na liniji 40
+INFO  16:12:17,930 - Pristup elementu niza niz na liniji 41
+INFO  16:12:17,930 - Pristup elementu niza niz na liniji 45
+INFO  16:12:17,931 - Pristup elementu niza niz na liniji 46
+INFO  16:12:17,931 - Pristup elementu niza niz na liniji 49
+INFO  16:12:17,931 - Pristup elementu niza niz na liniji 50
+INFO  16:12:17,931 - Zavrsetak obrade metode (procedure) testAssignArray na liniji 9
+INFO  16:12:17,931 - Pronadjen tip int u tabeli simbola na liniji 57
+INFO  16:12:17,931 - Pocetak obrade metode main na liniji 57
+INFO  16:12:17,931 - Pronadjen poziv metode (procedure) testAssignArray na liniji 58
+INFO  16:12:17,932 - Zavrsetak obrade metode (funkcije) main na liniji 57
+INFO  16:12:17,932 - Zavrsetak obrade programa MJProgram na liniji 1
+INFO  16:12:17,935 - Generating bytecode file: C:\Users\kf150605d\Desktop\PP_JUL_NOVO\workspace\MJCompiler\test\program.obj
+INFO  16:12:18,004 - Parsiranje uspesno zavrseno!

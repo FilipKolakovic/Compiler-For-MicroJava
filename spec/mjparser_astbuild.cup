@@ -1,0 +1,441 @@
+package rs.ac.bg.etf.pp1;
+import rs.ac.bg.etf.pp1.ast.*;
+import java_cup.runtime.*;
+import java_cup.parser;
+import java.io.*;
+import org.apache.log4j.*;
+
+parser code {:
+	
+	private boolean errorDetected = false;
+	private Symbol currSymbol = null;		
+	private Symbol errorSymbol = null;
+	
+	private Logger log = Logger.getLogger(getClass());
+      
+    // slede redefinisani metodi za prijavu gresaka radi izmene teksta poruke
+     
+    public void report_fatal_error(String message, Object info) throws java.lang.Exception {
+		done_parsing();
+		report_error(message, info);
+    }
+  
+    public void syntax_error(Symbol cur_token) {
+        report_error("Sintaksna greska", cur_token);
+    }
+  
+    public void unrecovered_syntax_error(Symbol cur_token) throws java.lang.Exception {
+        report_fatal_error("Fatalna greska, parsiranje se ne moze nastaviti", cur_token);
+    }
+
+    public void report_error(String message, Object info) {
+    	errorDetected = true;
+    	StringBuilder msg = new StringBuilder(message); 
+    	if (info instanceof Symbol) {			
+			errorSymbol = (Symbol) info;
+            msg.append(" na liniji ").append(errorSymbol.left);
+			msg.append(", koloni ").append(errorSymbol.right);
+			if (errorSymbol.value != null) {
+				msg.append(" za simbol \"").append(errorSymbol.value.toString()).append("\"");
+			}			
+			msg.append("!");
+		}
+        log.error(msg.toString());
+    }
+    
+    public void report_info(String message, Object info) {
+    	StringBuilder msg = new StringBuilder(message); 
+    	if (info instanceof Symbol) {
+            msg.append(" na liniji ").append(((Symbol)info).left);
+			msg.append(", koloni ").append(((Symbol)info).right);
+			if (errorSymbol.value != null) {
+				msg.append(" za simbol \"").append(((Symbol)info).value.toString()).append("\"");
+			}
+		}
+        log.info(msg.toString());
+    }
+	
+	public boolean isErrorDetected() {
+		return errorDetected;
+	}
+    
+	public Symbol getCurrSymbol() {
+		return currSymbol;
+	}
+	
+	public Symbol getErrorSymbol() {
+		return errorSymbol;
+	}
+:}
+
+scan with {:
+	currSymbol = this.getScanner().next_token();
+	if (currSymbol != null && currSymbol.value != null) {
+		log.info(currSymbol.toString() + " " + currSymbol.value.toString());
+	}
+	return currSymbol;
+:}
+
+terminal PROGRAM, PRINT, READ, CONST, VOID, NEW;
+terminal Boolean BOOL_CONST;
+terminal String IDENT;
+terminal Integer NUM_CONST;
+terminal Character CHAR_CONST;
+terminal AND, OR, PLUS, MINUS, MULTIPLICATION, DIVISION, MODULO, ADDASSIGN, SUBASSIGN, MULASSIGN, DIVASSIGN, MODASSIGN;
+terminal LEFT_BRACE, RIGHT_BRACE, LEFT_SQUARE, RIGHT_SQUARE;
+terminal ASSIGNMENT, INCREMENT, DECREMENT, SEMICOLON, COMMA, LEFT_PARENTHESIS, RIGHT_PARENTHESIS;
+terminal IF, ELSE, FOR, BREAK, CONTINUE, RETURN;
+terminal GREATER, EQUAL, LESSER, GREATER_EQUAL, LESSER_EQUAL, NOT_EQUAL;
+
+non terminal Program program;
+nonterminal Program_name program_name;
+nonterminal Program_con_var_decls program_con_var_decls;
+nonterminal Program_con_var_decl program_con_var_decl;
+nonterminal Program_meth_decls program_meth_decls;
+non terminal Const_declaration const_declaration;
+nonterminal Const_list const_list;
+nonterminal Const_part const_part;
+nonterminal Var_declaration var_declaration;
+nonterminal Var_list var_list;
+nonterminal Var_part var_part;
+nonterminal Var_declaration_list var_declaration_list;
+non terminal rs.etf.pp1.symboltable.concepts.Struct value;
+non terminal Method_declaration method_declaration;
+nonterminal Method_void_declaration method_void_declaration;
+nonterminal Method_type_declaration method_type_declaration;
+nonterminal Method_void_name method_void_name;
+nonterminal Method_type_and_name method_type_and_name;
+nonterminal Method_parameter method_parameter;
+nonterminal Method_parameters method_parameters;
+non terminal rs.etf.pp1.symboltable.concepts.Struct type;
+non terminal rs.etf.pp1.symboltable.concepts.Struct cond, condition, condition_term, condition_fact;
+non terminal Statement statement;
+nonterminal Statement_list statement_list;
+nonterminal Act_pars act_pars;
+non terminal Designator_statement designator_statement;
+non terminal rs.etf.pp1.symboltable.concepts.Struct expr;
+non terminal More_term_list more_term_list;
+nonterminal More_term_part more_term_part;
+non terminal rs.etf.pp1.symboltable.concepts.Struct term, factor;
+non terminal More_factor_list more_factor_list;
+nonterminal More_factor_part more_factor_part;
+non terminal rs.etf.pp1.symboltable.concepts.Obj designator;
+non terminal Rel_op rel_op;
+nonterminal Add_op add_op;
+nonterminal Mul_op mul_op;
+non terminal Statement_kw_if statement_kw_if;
+nonterminal Statement_kw_for statement_kw_for;
+nonterminal Statement_for_body statement_for_body;
+nonterminal Statement_if_body statement_if_body;
+non terminal Assign_op assign_op;
+nonterminal Add_op_right add_op_right;
+nonterminal Add_op_left add_op_left;
+nonterminal Mul_op_left mul_op_left;
+nonterminal Mul_op_right mul_op_right;
+
+non terminal Assignment_operations assignment_operations;
+nonterminal List_of_addition_assignment list_of_addition_assignment;
+nonterminal Designator_add_op_assignment_list designator_add_op_assignment_list;
+
+precedence left ELSE;
+//--------------------------------------------------------------------------------------------------------
+program ::= (Program_0) PROGRAM program_name:prg_name program_con_var_decls:p1 LEFT_BRACE program_meth_decls:p2 RIGHT_BRACE {: RESULT=new Program_0(prg_name, p1, p2); RESULT.setLine(prg_nameleft); :} // izlazna tacka programa	 											 
+		    |
+			(Program_1) PROGRAM program_name:prg_name program_con_var_decls:p1 LEFT_BRACE RIGHT_BRACE {: RESULT=new Program_1(prg_name, p1); RESULT.setLine(prg_nameleft); :}
+			|
+			(Program_2) PROGRAM program_name:prg_name LEFT_BRACE program_meth_decls:p1 RIGHT_BRACE {: RESULT=new Program_2(prg_name, p1); RESULT.setLine(prg_nameleft); :}
+			|
+			(Program_3) PROGRAM program_name:prg_name LEFT_BRACE RIGHT_BRACE {: RESULT=new Program_3(prg_name); RESULT.setLine(prg_nameleft); :};
+					
+program_name ::= (Program_name) IDENT:programName {: RESULT=new Program_name(programName); RESULT.setLine(programNameleft); :};	// ulazna tacka programa
+//-------------------------------------------------------------------------------------------------------- 					   					  
+program_con_var_decls ::= (Program_con_vars_multi) program_con_var_decls:p1 program_con_var_decl:p2 {: RESULT=new Program_con_vars_multi(p1, p2); RESULT.setLine(p1left); :}
+						  |
+					      (Program_con_vars_single) program_con_var_decl:p1 {: RESULT=new Program_con_vars_single(p1); RESULT.setLine(p1left); :};
+				
+program_con_var_decl ::= (Part_const_decl) const_declaration:c1 {: RESULT=new Part_const_decl(c1); RESULT.setLine(c1left); :}
+						 |
+			             (Part_var_decl) var_declaration:v1 {: RESULT=new Part_var_decl(v1); RESULT.setLine(v1left); :};
+					
+program_meth_decls ::=  (Program_methods_multi) program_meth_decls:p1 method_declaration:m2 {: RESULT=new Program_methods_multi(p1, m2); RESULT.setLine(p1left); :}
+						|
+					    (Program_methods_single) method_declaration:m1 {: RESULT=new Program_methods_single(m1); RESULT.setLine(m1left); :};
+//--------------------------------------------------------------------------------------------------------
+const_declaration::= (Const_declaration) CONST type:constType const_list:c1 SEMICOLON {: RESULT=new Const_declaration(constType, c1); RESULT.setLine(constTypeleft); :};	
+					 
+const_list ::= (Const_multi) const_list:c1 COMMA const_part:c2 {: RESULT=new Const_multi(c1, c2); RESULT.setLine(c1left); :}
+			   |			   
+			   (Const_single) const_part:c1 {: RESULT=new Const_single(c1); RESULT.setLine(c1left); :};
+
+const_part ::= (Const_part) IDENT:constName ASSIGNMENT value:constValue {: RESULT=new Const_part(constName, constValue); RESULT.setLine(constNameleft); :};
+			   
+var_declaration ::= (Var_declaration) type:varType var_list:v1 SEMICOLON {: RESULT=new Var_declaration(varType, v1); RESULT.setLine(varTypeleft); :};
+					
+var_list ::= (Var_multi) var_list:v1 COMMA var_part:v2 {: RESULT=new Var_multi(v1, v2); RESULT.setLine(v1left); :}
+			 |
+			 (Var_single) var_part:v1 {: RESULT=new Var_single(v1); RESULT.setLine(v1left); :};
+
+var_part ::= (Var_array) IDENT:varName LEFT_SQUARE RIGHT_SQUARE {: RESULT=new Var_array(varName); RESULT.setLine(varNameleft); :}
+			 |
+			 (Var_normal) IDENT:varName {: RESULT=new Var_normal(varName); RESULT.setLine(varNameleft); :}
+			 |
+			 (Var_error) error {: this.parser.report_error("Sintaksna greska - neispravna definicija promenljive", this.parser.getErrorSymbol()); :} {: RESULT=new Var_error(); :};
+//--------------------------------------------------------------------------------------------------------
+method_declaration ::= (Meth_void_decl) method_void_declaration:m1 {: RESULT=new Meth_void_decl(m1); RESULT.setLine(m1left); :}
+					   |
+					   (Meth_type_decl) method_type_declaration:m1 {: RESULT=new Meth_type_decl(m1); RESULT.setLine(m1left); :}; 
+
+method_void_declaration ::=  (Meth_void_0) method_void_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS var_declaration_list:v3 LEFT_BRACE statement_list:s4 RIGHT_BRACE {: RESULT=new Meth_void_0(m1, m2, v3, s4); RESULT.setLine(m1left); :}
+							 |
+							 (Meth_void_1) method_void_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS var_declaration_list:v3 LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_void_1(m1, m2, v3); RESULT.setLine(m1left); :}
+							 |
+							 (Meth_void_2) method_void_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS LEFT_BRACE statement_list:s3 RIGHT_BRACE {: RESULT=new Meth_void_2(m1, m2, s3); RESULT.setLine(m1left); :}
+							 |
+							 (Meth_void_3) method_void_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_void_3(m1, m2); RESULT.setLine(m1left); :}
+							 | 
+							 (Meth_void_4) method_void_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list:v2 LEFT_BRACE statement_list:s3 RIGHT_BRACE {: RESULT=new Meth_void_4(m1, v2, s3); RESULT.setLine(m1left); :}
+							 |
+							 (Meth_void_5) method_void_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list:v2 LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_void_5(m1, v2); RESULT.setLine(m1left); :}
+							 |
+							 (Meth_void_6) method_void_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE statement_list:s2 RIGHT_BRACE {: RESULT=new Meth_void_6(m1, s2); RESULT.setLine(m1left); :}
+							 |
+							 (Meth_void_7) method_void_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_void_7(m1); RESULT.setLine(m1left); :};					  
+							 // izlazne tacke void metoda  
+					 
+method_type_declaration::=	(Meth_type_0) method_type_and_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS var_declaration_list:v3 LEFT_BRACE statement_list:s4 RIGHT_BRACE {: RESULT=new Meth_type_0(m1, m2, v3, s4); RESULT.setLine(m1left); :}
+							|
+							(Meth_type_1) method_type_and_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS var_declaration_list:v3 LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_type_1(m1, m2, v3); RESULT.setLine(m1left); :}
+							|
+							(Meth_type_2) method_type_and_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS LEFT_BRACE statement_list:s3 RIGHT_BRACE {: RESULT=new Meth_type_2(m1, m2, s3); RESULT.setLine(m1left); :}
+							|
+							(Meth_type_3) method_type_and_name:m1 LEFT_PARENTHESIS method_parameters:m2 RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_type_3(m1, m2); RESULT.setLine(m1left); :}
+							| 
+							(Meth_type_4) method_type_and_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list:v2 LEFT_BRACE statement_list:s3 RIGHT_BRACE {: RESULT=new Meth_type_4(m1, v2, s3); RESULT.setLine(m1left); :}
+							|
+							(Meth_type_5) method_type_and_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list:v2 LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_type_5(m1, v2); RESULT.setLine(m1left); :}
+							|
+							(Meth_type_6) method_type_and_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE statement_list:s2 RIGHT_BRACE {: RESULT=new Meth_type_6(m1, s2); RESULT.setLine(m1left); :}
+							|
+							(Meth_type_7) method_type_and_name:m1 LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE {: RESULT=new Meth_type_7(m1); RESULT.setLine(m1left); :};					  
+							// izlazne tacke metoda koje vracaju vrednost
+					   					   					  
+method_void_name ::= (Method_void_name) VOID IDENT:methodName {: RESULT=new Method_void_name(methodName); RESULT.setLine(methodNameleft); :}; // ulazna tacka metode koja je void
+					   
+method_type_and_name ::= (Method_type_name) type:returnType IDENT:methodName {: RESULT=new Method_type_name(returnType, methodName); RESULT.setLine(returnTypeleft); :};	// ulazna tacka metode koja vraca neku vrednost
+						
+method_parameters ::= (Param_multi) method_parameters:m1 COMMA method_parameter:m2 {: RESULT=new Param_multi(m1, m2); RESULT.setLine(m1left); :}
+					  |	
+					  (Param_single) method_parameter:m1 {: RESULT=new Param_single(m1); RESULT.setLine(m1left); :};					  					 
+					  
+method_parameter ::= (Param_array) type:paramType IDENT:paramName LEFT_SQUARE RIGHT_SQUARE {: RESULT=new Param_array(paramType, paramName); RESULT.setLine(paramTypeleft); :}
+					 |
+					 (Param_normal) type:paramType IDENT:paramName {: RESULT=new Param_normal(paramType, paramName); RESULT.setLine(paramTypeleft); :}
+					 |
+					 (Param_error) error {: this.parser.report_error("Sintaksna greska - neispravni formalni parametri funkcije", this.parser.getErrorSymbol()); :} {: RESULT=new Param_error(); :};					
+					 
+var_declaration_list ::= (Var_decl_multi) var_declaration_list:v1 var_declaration:v2 {: RESULT=new Var_decl_multi(v1, v2); RESULT.setLine(v1left); :}
+						 |
+						 (Var_decl_single) var_declaration:v1 {: RESULT=new Var_decl_single(v1); RESULT.setLine(v1left); :};
+//--------------------------------------------------------------------------------------------------------
+type ::= (Type) IDENT:typeName {: RESULT=new Type(typeName); RESULT.setLine(typeNameleft); :};
+//--------------------------------------------------------------------------------------------------------
+value ::= (Val_Num_const) NUM_CONST:N1 {: RESULT=new Val_Num_const(N1); RESULT.setLine(N1left); :}
+		  |
+		  (Val_Bool_const) BOOL_CONST:B1 {: RESULT=new Val_Bool_const(B1); RESULT.setLine(B1left); :}
+		  |
+		  (Val_Char_const) CHAR_CONST:C1 {: RESULT=new Val_Char_const(C1); RESULT.setLine(C1left); :};				
+//--------------------------------------------------------------------------------------------------------				   
+statement_list ::= (Statement_multi) statement_list:s1 statement:s2 {: RESULT=new Statement_multi(s1, s2); RESULT.setLine(s1left); :}
+				   |
+				   (Statement_single) statement:s1 {: RESULT=new Statement_single(s1); RESULT.setLine(s1left); :};													
+
+statement ::= (Stmt_design) designator_statement:d1 SEMICOLON {: RESULT=new Stmt_design(d1); RESULT.setLine(d1left); :}						
+			  |			  
+			  (Stmt_Read) READ LEFT_PARENTHESIS designator:d1 RIGHT_PARENTHESIS SEMICOLON {: RESULT=new Stmt_Read(d1); RESULT.setLine(d1left); :}
+			  |
+			  (Stmt_print_0) PRINT LEFT_PARENTHESIS expr:e1 COMMA NUM_CONST:N2 RIGHT_PARENTHESIS SEMICOLON {: RESULT=new Stmt_print_0(e1, N2); RESULT.setLine(e1left); :}
+			  |
+			  (Stmt_print_1) PRINT LEFT_PARENTHESIS expr:e1 RIGHT_PARENTHESIS SEMICOLON {: RESULT=new Stmt_print_1(e1); RESULT.setLine(e1left); :}
+			  |
+			  (Stmt_if_else) statement_kw_if:s1 statement_if_body:s2 ELSE statement:s3 {: RESULT=new Stmt_if_else(s1, s2, s3); RESULT.setLine(s1left); :}
+			  |
+			  (Stmt_if) statement_kw_if:s1 statement_if_body:s2 {: RESULT=new Stmt_if(s1, s2); RESULT.setLine(s1left); :}
+			  |
+			  (Stmt_for) statement_kw_for:s1 statement_for_body:s2 {: RESULT=new Stmt_for(s1, s2); RESULT.setLine(s1left); :}
+			  |
+			  (Stmt_break)BREAK SEMICOLON {: RESULT=new Stmt_break(); :}
+			  |
+			  (Stmt_continue) CONTINUE SEMICOLON {: RESULT=new Stmt_continue(); :}
+			  |
+			  (Stmt_return_val) RETURN expr:EXPRESSION SEMICOLON {: RESULT=new Stmt_return_val(EXPRESSION); RESULT.setLine(EXPRESSIONleft); :}
+			  |
+			  (Stmt_return) RETURN SEMICOLON {: RESULT=new Stmt_return(); :}
+			  |
+			  (Stmt_list)LEFT_BRACE statement_list:s1 RIGHT_BRACE {: RESULT=new Stmt_list(s1); RESULT.setLine(s1left); :}
+			  |
+			  (Stmt_braces)LEFT_BRACE RIGHT_BRACE {: RESULT=new Stmt_braces(); :}; 
+
+// da bi se inkrementirao nivo ugnezdivanja if naredbe
+statement_kw_if ::= (Stmt_kw_if) IF {: RESULT=new Stmt_kw_if(); :};
+			  
+// uvodi se novi neterminal da bi mogla da se markira adresa skoka kojim se potom preskoci else grana
+statement_if_body ::= (Stmt_if_body) LEFT_PARENTHESIS condition:c1 RIGHT_PARENTHESIS statement:s2 {: RESULT=new Stmt_if_body(c1, s2); RESULT.setLine(c1left); :};	
+
+// uvodi se novi neterminal, uveden da bi mogla da se markira povratna adresa skoka koji se ubacuje potom
+// i zbog ugnezdivanja petlje
+statement_kw_for ::= (Stmt_kw_for) FOR {: RESULT=new Stmt_kw_for(); :}; 
+
+statement_for_body ::= (Stmt_for_body_0) LEFT_PARENTHESIS designator_statement:d1 SEMICOLON condition:c2 SEMICOLON designator_statement:d3 RIGHT_PARENTHESIS statement:s4 {: RESULT=new Stmt_for_body_0(d1, c2, d3, s4); RESULT.setLine(d1left); :}
+					   |
+					   (Stmt_for_body_1) LEFT_PARENTHESIS SEMICOLON condition:c1 SEMICOLON designator_statement:d2 RIGHT_PARENTHESIS statement:s3 {: RESULT=new Stmt_for_body_1(c1, d2, s3); RESULT.setLine(c1left); :}
+					   |
+					   (Stmt_for_body_2) LEFT_PARENTHESIS designator_statement:d1 SEMICOLON SEMICOLON designator_statement:d2 RIGHT_PARENTHESIS statement:s3 {: RESULT=new Stmt_for_body_2(d1, d2, s3); RESULT.setLine(d1left); :}
+					   |
+					   (Stmt_for_body_3) LEFT_PARENTHESIS designator_statement:d1 SEMICOLON condition:c2 SEMICOLON RIGHT_PARENTHESIS statement:s3 {: RESULT=new Stmt_for_body_3(d1, c2, s3); RESULT.setLine(d1left); :}
+					   |
+					   (Stmt_for_body_4) LEFT_PARENTHESIS SEMICOLON SEMICOLON designator_statement:d1 RIGHT_PARENTHESIS statement:s2 {: RESULT=new Stmt_for_body_4(d1, s2); RESULT.setLine(d1left); :}
+					   |
+					   (Stmt_for_body_5) LEFT_PARENTHESIS SEMICOLON condition:c1 SEMICOLON RIGHT_PARENTHESIS statement:s2 {: RESULT=new Stmt_for_body_5(c1, s2); RESULT.setLine(c1left); :}
+					   |
+					   (Stmt_for_body_6) LEFT_PARENTHESIS designator_statement:d1 SEMICOLON SEMICOLON RIGHT_PARENTHESIS statement:s2 {: RESULT=new Stmt_for_body_6(d1, s2); RESULT.setLine(d1left); :}
+					   |
+					   (Stmt_for_body_7) LEFT_PARENTHESIS SEMICOLON SEMICOLON RIGHT_PARENTHESIS statement:s1 {: RESULT=new Stmt_for_body_7(s1); RESULT.setLine(s1left); :};
+
+act_pars ::= (Act_Pars_Multi) act_pars:a1 COMMA expr:e2 {: RESULT=new Act_Pars_Multi(a1, e2); RESULT.setLine(a1left); :}
+			 |
+			 (Act_Pars_Single) expr:e1 {: RESULT=new Act_Pars_Single(e1); RESULT.setLine(e1left); :};
+			 
+// setuje se da condition da bude izlazna tacka cond-a, novi neterminal cond se uvodi.
+condition ::= (Condition0) cond:c1 {: RESULT=new Condition0(c1); RESULT.setLine(c1left); :};
+			 
+cond ::= (Condition_two) cond:c1 OR condition_term:c2 {: RESULT=new Condition_two(c1, c2); RESULT.setLine(c1left); :}
+		 |
+		 (Condition_one) condition_term:c1 {: RESULT=new Condition_one(c1); RESULT.setLine(c1left); :};
+			  			 			  
+condition_term ::=  (Cond_term_two) condition_term:c1 AND condition_fact:c2 {: RESULT=new Cond_term_two(c1, c2); RESULT.setLine(c1left); :}
+					|
+			        (Cond_term_one) condition_fact:c1 {: RESULT=new Cond_term_one(c1); RESULT.setLine(c1left); :};
+			  
+condition_fact ::=  (Cond_fact_two) expr:e1 rel_op:r2 expr:e3 {: RESULT=new Cond_fact_two(e1, r2, e3); RESULT.setLine(e1left); :}
+					|
+					(Cond_fact_one) expr:e1 {: RESULT=new Cond_fact_one(e1); RESULT.setLine(e1left); :};
+			  			  			  			  
+designator_statement ::= (Assignment_operation) assignment_operations:a1 {: RESULT=new Assignment_operation(a1); RESULT.setLine(a1left); :}
+						 |
+						 (Increment) designator:DESIGN INCREMENT {: RESULT=new Increment(DESIGN); RESULT.setLine(DESIGNleft); :}
+						 |
+						 (Decrement) designator:DESIGN DECREMENT {: RESULT=new Decrement(DESIGN); RESULT.setLine(DESIGNleft); :}
+						 |
+						 (Method_call_0) designator:methodName LEFT_PARENTHESIS act_pars:a1 RIGHT_PARENTHESIS {: RESULT=new Method_call_0(methodName, a1); RESULT.setLine(methodNameleft); :}
+						 |
+						 (Method_call_1) designator:methodName LEFT_PARENTHESIS RIGHT_PARENTHESIS {: RESULT=new Method_call_1(methodName); RESULT.setLine(methodNameleft); :};
+						 
+						 
+assignment_operations ::=  (Assignment_operation_single) designator:DESIGN assign_op:a1 expr:EXPRESSION {: RESULT=new Assignment_operation_single(DESIGN, a1, EXPRESSION); RESULT.setLine(DESIGNleft); :}
+						   |
+						   (Assignment_operation_multi) list_of_addition_assignment:l1 {: RESULT=new Assignment_operation_multi(l1); RESULT.setLine(l1left); :};
+							
+							
+list_of_addition_assignment ::= (Assignment_addition_list) designator:DESIGN1 assign_op:a1 designator:DESIGN2 designator_add_op_assignment_list:d2 {: RESULT=new Assignment_addition_list(DESIGN1, a1, DESIGN2, d2); RESULT.setLine(DESIGN1left); :};
+								   
+designator_add_op_assignment_list ::= (Add_Op_Assignment_Designator_List) assign_op:a1 designator:DESIGN designator_add_op_assignment_list:d2 {: RESULT=new Add_Op_Assignment_Designator_List(a1, DESIGN, d2); RESULT.setLine(a1left); :}
+									  |
+									  (Add_Op_Assignment_Designator_Part) assign_op:a1 expr:EXPRESSION {: RESULT=new Add_Op_Assignment_Designator_Part(a1, EXPRESSION); RESULT.setLine(a1left); :};
+									  
+									  		
+assign_op ::= (Assignment_operator) ASSIGNMENT {: RESULT=new Assignment_operator(); :}
+			  |
+			  (Assignment_add_sub_op_right) add_op_right:a1 {: RESULT=new Assignment_add_sub_op_right(a1); RESULT.setLine(a1left); :}
+			  |
+			  (Assignment_mul_op_right) mul_op_right:m1 {: RESULT=new Assignment_mul_op_right(m1); RESULT.setLine(m1left); :};
+			 				 
+					 
+expr ::= (Expr_neg_term_multi) MINUS term:t1 more_term_list:m2 {: RESULT=new Expr_neg_term_multi(t1, m2); RESULT.setLine(t1left); :}
+		 |
+		 (Expr_neg_term_single) MINUS term:t1 {: RESULT=new Expr_neg_term_single(t1); RESULT.setLine(t1left); :}
+		 |
+		 (Expr_term_multi) term:t1 more_term_list:m2 {: RESULT=new Expr_term_multi(t1, m2); RESULT.setLine(t1left); :}
+		 |
+		 (Expr_term_single) term:t1 {: RESULT=new Expr_term_single(t1); RESULT.setLine(t1left); :}
+		 |		 
+		 (Expr_error) error {: this.parser.report_error("Sintaksna greska - neispravan izraz", this.parser.getErrorSymbol()); :} {: RESULT=new Expr_error(); :};
+		 
+more_term_list ::= (More_term_multi) more_term_list:m1 more_term_part:m2 {: RESULT=new More_term_multi(m1, m2); RESULT.setLine(m1left); :}
+				   |
+				   (More_term_single) more_term_part:m1 {: RESULT=new More_term_single(m1); RESULT.setLine(m1left); :};	
+
+more_term_part ::= (More_term_part) add_op_left:a1 term:t2 {: RESULT=new More_term_part(a1, t2); RESULT.setLine(a1left); :};									 
+			
+term ::= (Term_multi) factor:f1 more_factor_list:m2 {: RESULT=new Term_multi(f1, m2); RESULT.setLine(f1left); :}
+		 |
+		 (Term_single) factor:f1 {: RESULT=new Term_single(f1); RESULT.setLine(f1left); :};
+			
+more_factor_list ::= (More_factor_multi) more_factor_list:m1 more_factor_part:m2 {: RESULT=new More_factor_multi(m1, m2); RESULT.setLine(m1left); :}
+					 |
+					 (More_factor_single) more_factor_part:m1 {: RESULT=new More_factor_single(m1); RESULT.setLine(m1left); :};	
+
+more_factor_part ::= (More_factor_part) mul_op_left:m1 factor:f2 {: RESULT=new More_factor_part(m1, f2); RESULT.setLine(m1left); :};								
+
+factor ::= (Factor_num_const) NUM_CONST:N1 {: RESULT=new Factor_num_const(N1); RESULT.setLine(N1left); :} 
+		   | 
+		   (Factor_bool_const) BOOL_CONST:B1 {: RESULT=new Factor_bool_const(B1); RESULT.setLine(B1left); :}
+		   | 
+		   (Factor_char_const) CHAR_CONST:C1 {: RESULT=new Factor_char_const(C1); RESULT.setLine(C1left); :} 
+		   | 
+		   (Factor_expr) LEFT_PARENTHESIS expr:e1 RIGHT_PARENTHESIS {: RESULT=new Factor_expr(e1); RESULT.setLine(e1left); :}
+		   |
+		   (Factor_new) NEW type:t1 {: RESULT=new Factor_new(t1); RESULT.setLine(t1left); :}
+		   |		  
+		   (Factor_new_array) NEW type:t1 LEFT_SQUARE expr:e2 RIGHT_SQUARE {: RESULT=new Factor_new_array(t1, e2); RESULT.setLine(t1left); :}
+		   |		   
+		   (Factor_meth_call_0) designator:methodName LEFT_PARENTHESIS act_pars:a1 RIGHT_PARENTHESIS {: RESULT=new Factor_meth_call_0(methodName, a1); RESULT.setLine(methodNameleft); :}
+		   |		   
+		   (Factor_meth_call_1) designator:methodName LEFT_PARENTHESIS RIGHT_PARENTHESIS {: RESULT=new Factor_meth_call_1(methodName); RESULT.setLine(methodNameleft); :}   		  		   		  
+		   |
+		   (Factor_designator) designator:DESIGN {: RESULT=new Factor_designator(DESIGN); RESULT.setLine(DESIGNleft); :};
+
+designator ::= (Designator_0) IDENT:ID LEFT_SQUARE expr:e1 RIGHT_SQUARE {: RESULT=new Designator_0(ID, e1); RESULT.setLine(IDleft); :}
+			   |
+			   (Designator_1) IDENT:ID {: RESULT=new Designator_1(ID); RESULT.setLine(IDleft); :};
+			   
+rel_op ::= (Rel_op_gt) GREATER {: RESULT=new Rel_op_gt(); :}
+		   |
+		   (Rel_op_eq) EQUAL {: RESULT=new Rel_op_eq(); :}
+		   |
+		   (Rel_op_lt) LESSER {: RESULT=new Rel_op_lt(); :}
+		   |
+		   (Rel_op_ge) GREATER_EQUAL {: RESULT=new Rel_op_ge(); :}
+		   |
+		   (Rel_op_le) LESSER_EQUAL {: RESULT=new Rel_op_le(); :}
+		   |
+		   (Rel_op_ne) NOT_EQUAL {: RESULT=new Rel_op_ne(); :};
+
+add_op ::= (Add_op_left_addop) add_op_left:a1 {: RESULT=new Add_op_left_addop(a1); RESULT.setLine(a1left); :} 
+		   | 
+		   (Add_op_right_addop) add_op_right:a1 {: RESULT=new Add_op_right_addop(a1); RESULT.setLine(a1left); :};
+		   
+add_op_left ::= (Add_op_left_add) PLUS {: RESULT=new Add_op_left_add(); :}
+			  	|
+			  	(Add_op_left_sub) MINUS {: RESULT=new Add_op_left_sub(); :};
+			  	
+add_op_right ::= (Add_And_Assign_Right) ADDASSIGN {: RESULT=new Add_And_Assign_Right(); :}
+			     |
+			     (Sub_And_Assign_Right) SUBASSIGN {: RESULT=new Sub_And_Assign_Right(); :};	 	
+
+mul_op ::= (Mul_op_left_mulop) mul_op_left:m1 {: RESULT=new Mul_op_left_mulop(m1); RESULT.setLine(m1left); :}
+		   | 
+		   (Mul_op_right_mulop) mul_op_right:m1 {: RESULT=new Mul_op_right_mulop(m1); RESULT.setLine(m1left); :};
+		   
+mul_op_left ::= (Multiplication) MULTIPLICATION {: RESULT=new Multiplication(); :}
+				|
+				(Division) DIVISION {: RESULT=new Division(); :}
+				|
+				(Modulo) MODULO {: RESULT=new Modulo(); :};
+				
+mul_op_right ::= (Mul_and_assign_right) MULASSIGN {: RESULT=new Mul_and_assign_right(); :}
+				 |
+				 (Div_and_assign_right) DIVASSIGN {: RESULT=new Div_and_assign_right(); :}
+				 |
+				 (Mod_and_assign_right) MODASSIGN {: RESULT=new Mod_and_assign_right(); :};
+
+

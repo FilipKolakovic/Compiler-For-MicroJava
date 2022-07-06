@@ -1,0 +1,62 @@
+program MJProgram
+	int x, y;
+	char c1, c2;
+	const int conInt = 10;
+	const char conChr = 'a';
+	bool uslov;
+
+{	
+	void testAssignArray() int niz[];{
+		
+		uslov = false;
+		print(uslov);
+		x = 3;
+		print(x);
+		niz = new int[4];
+		niz[0] = 10;
+		niz[1] = 20;
+		niz[2] = 30;
+		niz[3] = 40;
+		
+		niz[0]++;
+		niz[1]--;
+		
+		niz[2] = niz[0];
+		niz[3] = niz[1];
+		
+		niz[0] = 0;
+		niz[1] = 1;
+		niz[2] = 2;
+		niz[3] = 3;
+
+		x = niz[3];
+		x = conInt;
+		
+		niz[0] += niz[1] *= x -= niz[2]*5 - 4*niz[1];
+		
+		print(niz[0]);
+		print(niz[1]);
+		print(x);
+		print(niz[2]);
+		print(niz[3]);
+		
+		read(y);
+		print(y);
+		read(niz[0]);
+		print(niz[0]);
+		
+		x = y;
+		x = niz[0]*40;
+		x -= y *= niz[0];
+		
+		print(y);
+		print(x);
+	}
+
+	
+	int main() {
+		testAssignArray();
+				
+		return 0;
+	}
+}

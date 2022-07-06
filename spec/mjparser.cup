@@ -1,0 +1,410 @@
+package rs.ac.bg.etf.pp1;
+import rs.ac.bg.etf.pp1.ast.*;
+import java_cup.runtime.*;
+import java_cup.parser;
+import java.io.*;
+import org.apache.log4j.*;
+
+parser code {:
+	
+	private boolean errorDetected = false;
+	private Symbol currSymbol = null;		
+	private Symbol errorSymbol = null;
+	
+	private Logger log = Logger.getLogger(getClass());
+      
+    // slede redefinisani metodi za prijavu gresaka radi izmene teksta poruke
+     
+    public void report_fatal_error(String message, Object info) throws java.lang.Exception {
+		done_parsing();
+		report_error(message, info);
+    }
+  
+    public void syntax_error(Symbol cur_token) {
+        report_error("Sintaksna greska", cur_token);
+    }
+  
+    public void unrecovered_syntax_error(Symbol cur_token) throws java.lang.Exception {
+        report_fatal_error("Fatalna greska, parsiranje se ne moze nastaviti", cur_token);
+    }
+
+    public void report_error(String message, Object info) {
+    	errorDetected = true;
+    	StringBuilder msg = new StringBuilder(message); 
+    	if (info instanceof Symbol) {			
+			errorSymbol = (Symbol) info;
+            msg.append(" na liniji ").append(errorSymbol.left);
+			msg.append(", koloni ").append(errorSymbol.right);
+			if (errorSymbol.value != null) {
+				msg.append(" za simbol \"").append(errorSymbol.value.toString()).append("\"");
+			}			
+			msg.append("!");
+		}
+        log.error(msg.toString());
+    }
+    
+    public void report_info(String message, Object info) {
+    	StringBuilder msg = new StringBuilder(message); 
+    	if (info instanceof Symbol) {
+            msg.append(" na liniji ").append(((Symbol)info).left);
+			msg.append(", koloni ").append(((Symbol)info).right);
+			if (errorSymbol.value != null) {
+				msg.append(" za simbol \"").append(((Symbol)info).value.toString()).append("\"");
+			}
+		}
+        log.info(msg.toString());
+    }
+	
+	public boolean isErrorDetected() {
+		return errorDetected;
+	}
+    
+	public Symbol getCurrSymbol() {
+		return currSymbol;
+	}
+	
+	public Symbol getErrorSymbol() {
+		return errorSymbol;
+	}
+:}
+
+scan with {:
+	currSymbol = this.getScanner().next_token();
+	if (currSymbol != null && currSymbol.value != null) {
+		log.info(currSymbol.toString() + " " + currSymbol.value.toString());
+	}
+	return currSymbol;
+:}
+
+terminal PROGRAM, PRINT, READ, CONST, VOID, NEW;
+terminal Boolean BOOL_CONST;
+terminal String IDENT;
+terminal Integer NUM_CONST;
+terminal Character CHAR_CONST;
+terminal AND, OR, PLUS, MINUS, MULTIPLICATION, DIVISION, MODULO, ADDASSIGN, SUBASSIGN, MULASSIGN, DIVASSIGN, MODASSIGN;
+terminal LEFT_BRACE, RIGHT_BRACE, LEFT_SQUARE, RIGHT_SQUARE;
+terminal ASSIGNMENT, INCREMENT, DECREMENT, SEMICOLON, COMMA, LEFT_PARENTHESIS, RIGHT_PARENTHESIS;
+terminal IF, ELSE, FOR, BREAK, CONTINUE, RETURN;
+terminal GREATER, EQUAL, LESSER, GREATER_EQUAL, LESSER_EQUAL, NOT_EQUAL;
+
+non terminal program, program_name, program_con_var_decls, program_con_var_decl, program_meth_decls;
+non terminal const_declaration, const_list, const_part, var_declaration, var_list, var_part, var_declaration_list;
+non terminal rs.etf.pp1.symboltable.concepts.Struct value;
+non terminal method_declaration, method_void_declaration, method_type_declaration, method_void_name, method_type_and_name, method_parameter, method_parameters;
+non terminal rs.etf.pp1.symboltable.concepts.Struct type;
+non terminal rs.etf.pp1.symboltable.concepts.Struct cond, condition, condition_term, condition_fact;
+non terminal statement, statement_list, act_pars;
+non terminal designator_statement;
+non terminal rs.etf.pp1.symboltable.concepts.Struct expr;
+non terminal more_term_list, more_term_part;
+non terminal rs.etf.pp1.symboltable.concepts.Struct term, factor;
+non terminal more_factor_list, more_factor_part;
+non terminal rs.etf.pp1.symboltable.concepts.Obj designator;
+non terminal rel_op, add_op, mul_op;
+non terminal statement_kw_if, statement_kw_for, statement_for_body, statement_if_body;
+non terminal assign_op, add_op_right, add_op_left, mul_op_left, mul_op_right;
+
+non terminal assignment_operations, list_of_addition_assignment, designator_add_op_assignment_list;
+
+precedence left ELSE;
+//--------------------------------------------------------------------------------------------------------
+program ::= (Program_0) PROGRAM program_name:prg_name program_con_var_decls LEFT_BRACE program_meth_decls RIGHT_BRACE // izlazna tacka programa	 											 
+		    |
+			(Program_1) PROGRAM program_name:prg_name program_con_var_decls LEFT_BRACE RIGHT_BRACE
+			|
+			(Program_2) PROGRAM program_name:prg_name LEFT_BRACE program_meth_decls RIGHT_BRACE
+			|
+			(Program_3) PROGRAM program_name:prg_name LEFT_BRACE RIGHT_BRACE;
+					
+program_name ::= (Program_name) IDENT:programName;	// ulazna tacka programa
+//-------------------------------------------------------------------------------------------------------- 					   					  
+program_con_var_decls ::= (Program_con_vars_multi) program_con_var_decls program_con_var_decl
+						  |
+					      (Program_con_vars_single) program_con_var_decl;
+				
+program_con_var_decl ::= (Part_const_decl) const_declaration
+						 |
+			             (Part_var_decl) var_declaration;
+					
+program_meth_decls ::=  (Program_methods_multi) program_meth_decls method_declaration
+						|
+					    (Program_methods_single) method_declaration;
+//--------------------------------------------------------------------------------------------------------
+const_declaration::= (Const_declaration) CONST type:constType const_list SEMICOLON;	
+					 
+const_list ::= (Const_multi) const_list COMMA const_part
+			   |			   
+			   (Const_single) const_part;
+
+const_part ::= (Const_part) IDENT:constName ASSIGNMENT value:constValue;
+			   
+var_declaration ::= (Var_declaration) type:varType var_list SEMICOLON;
+					
+var_list ::= (Var_multi) var_list COMMA var_part
+			 |
+			 (Var_single) var_part;
+
+var_part ::= (Var_array) IDENT:varName LEFT_SQUARE RIGHT_SQUARE
+			 |
+			 (Var_normal) IDENT:varName
+			 |
+			 (Var_error) error {: this.parser.report_error("Sintaksna greska - neispravna definicija promenljive", this.parser.getErrorSymbol()); :};
+//--------------------------------------------------------------------------------------------------------
+method_declaration ::= (Meth_void_decl) method_void_declaration
+					   |
+					   (Meth_type_decl) method_type_declaration; 
+
+method_void_declaration ::=  (Meth_void_0) method_void_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE statement_list RIGHT_BRACE
+							 |
+							 (Meth_void_1) method_void_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE RIGHT_BRACE
+							 |
+							 (Meth_void_2) method_void_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS LEFT_BRACE statement_list RIGHT_BRACE
+							 |
+							 (Meth_void_3) method_void_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE
+							 | 
+							 (Meth_void_4) method_void_name LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE statement_list RIGHT_BRACE
+							 |
+							 (Meth_void_5) method_void_name LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE RIGHT_BRACE
+							 |
+							 (Meth_void_6) method_void_name LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE statement_list RIGHT_BRACE
+							 |
+							 (Meth_void_7) method_void_name LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE;					  
+							 // izlazne tacke void metoda  
+					 
+method_type_declaration::=	(Meth_type_0) method_type_and_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE statement_list RIGHT_BRACE
+							|
+							(Meth_type_1) method_type_and_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE RIGHT_BRACE
+							|
+							(Meth_type_2) method_type_and_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS LEFT_BRACE statement_list RIGHT_BRACE
+							|
+							(Meth_type_3) method_type_and_name LEFT_PARENTHESIS method_parameters RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE
+							| 
+							(Meth_type_4) method_type_and_name LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE statement_list RIGHT_BRACE
+							|
+							(Meth_type_5) method_type_and_name LEFT_PARENTHESIS RIGHT_PARENTHESIS var_declaration_list LEFT_BRACE RIGHT_BRACE
+							|
+							(Meth_type_6) method_type_and_name LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE statement_list RIGHT_BRACE
+							|
+							(Meth_type_7) method_type_and_name LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE;					  
+							// izlazne tacke metoda koje vracaju vrednost
+					   					   					  
+method_void_name ::= (Method_void_name) VOID IDENT:methodName; // ulazna tacka metode koja je void
+					   
+method_type_and_name ::= (Method_type_name) type:returnType IDENT:methodName;	// ulazna tacka metode koja vraca neku vrednost
+						
+method_parameters ::= (Param_multi) method_parameters COMMA method_parameter
+					  |	
+					  (Param_single) method_parameter;					  					 
+					  
+method_parameter ::= (Param_array) type:paramType IDENT:paramName LEFT_SQUARE RIGHT_SQUARE
+					 |
+					 (Param_normal) type:paramType IDENT:paramName
+					 |
+					 (Param_error) error {: this.parser.report_error("Sintaksna greska - neispravni formalni parametri funkcije", this.parser.getErrorSymbol()); :};					
+					 
+var_declaration_list ::= (Var_decl_multi) var_declaration_list var_declaration
+						 |
+						 (Var_decl_single) var_declaration;
+//--------------------------------------------------------------------------------------------------------
+type ::= (Type) IDENT:typeName;
+//--------------------------------------------------------------------------------------------------------
+value ::= (Val_Num_const) NUM_CONST
+		  |
+		  (Val_Bool_const) BOOL_CONST
+		  |
+		  (Val_Char_const) CHAR_CONST;				
+//--------------------------------------------------------------------------------------------------------				   
+statement_list ::= (Statement_multi) statement_list statement
+				   |
+				   (Statement_single) statement;													
+
+statement ::= (Stmt_design) designator_statement SEMICOLON						
+			  |			  
+			  (Stmt_Read) READ LEFT_PARENTHESIS designator RIGHT_PARENTHESIS SEMICOLON
+			  |
+			  (Stmt_print_0) PRINT LEFT_PARENTHESIS expr COMMA NUM_CONST RIGHT_PARENTHESIS SEMICOLON
+			  |
+			  (Stmt_print_1) PRINT LEFT_PARENTHESIS expr RIGHT_PARENTHESIS SEMICOLON
+			  |
+			  (Stmt_if_else) statement_kw_if statement_if_body ELSE statement
+			  |
+			  (Stmt_if) statement_kw_if statement_if_body
+			  |
+			  (Stmt_for) statement_kw_for statement_for_body
+			  |
+			  (Stmt_break)BREAK SEMICOLON
+			  |
+			  (Stmt_continue) CONTINUE SEMICOLON
+			  |
+			  (Stmt_return_val) RETURN expr:EXPRESSION SEMICOLON
+			  |
+			  (Stmt_return) RETURN SEMICOLON
+			  |
+			  (Stmt_list)LEFT_BRACE statement_list RIGHT_BRACE
+			  |
+			  (Stmt_braces)LEFT_BRACE RIGHT_BRACE; 
+
+// da bi se inkrementirao nivo ugnezdivanja if naredbe
+statement_kw_if ::= (Stmt_kw_if) IF;
+			  
+// uvodi se novi neterminal da bi mogla da se markira adresa skoka kojim se potom preskoci else grana
+statement_if_body ::= (Stmt_if_body) LEFT_PARENTHESIS condition RIGHT_PARENTHESIS statement;	
+
+// uvodi se novi neterminal, uveden da bi mogla da se markira povratna adresa skoka koji se ubacuje potom
+// i zbog ugnezdivanja petlje
+statement_kw_for ::= (Stmt_kw_for) FOR; 
+
+statement_for_body ::= (Stmt_for_body_0) LEFT_PARENTHESIS designator_statement SEMICOLON condition SEMICOLON designator_statement RIGHT_PARENTHESIS statement
+					   |
+					   (Stmt_for_body_1) LEFT_PARENTHESIS SEMICOLON condition SEMICOLON designator_statement RIGHT_PARENTHESIS statement
+					   |
+					   (Stmt_for_body_2) LEFT_PARENTHESIS designator_statement SEMICOLON SEMICOLON designator_statement RIGHT_PARENTHESIS statement
+					   |
+					   (Stmt_for_body_3) LEFT_PARENTHESIS designator_statement SEMICOLON condition SEMICOLON RIGHT_PARENTHESIS statement
+					   |
+					   (Stmt_for_body_4) LEFT_PARENTHESIS SEMICOLON SEMICOLON designator_statement RIGHT_PARENTHESIS statement
+					   |
+					   (Stmt_for_body_5) LEFT_PARENTHESIS SEMICOLON condition SEMICOLON RIGHT_PARENTHESIS statement
+					   |
+					   (Stmt_for_body_6) LEFT_PARENTHESIS designator_statement SEMICOLON SEMICOLON RIGHT_PARENTHESIS statement
+					   |
+					   (Stmt_for_body_7) LEFT_PARENTHESIS SEMICOLON SEMICOLON RIGHT_PARENTHESIS statement;
+
+act_pars ::= (Act_Pars_Multi) act_pars COMMA expr
+			 |
+			 (Act_Pars_Single) expr;
+			 
+// setuje se da condition da bude izlazna tacka cond-a, novi neterminal cond se uvodi.
+condition ::= (Condition0) cond;
+			 
+cond ::= (Condition_two) cond OR condition_term
+		 |
+		 (Condition_one) condition_term;
+			  			 			  
+condition_term ::=  (Cond_term_two) condition_term AND condition_fact
+					|
+			        (Cond_term_one) condition_fact;
+			  
+condition_fact ::=  (Cond_fact_two) expr rel_op expr
+					|
+					(Cond_fact_one) expr;
+			  			  			  			  
+designator_statement ::= (Assignment_operation) assignment_operations
+						 |
+						 (Increment) designator:DESIGN INCREMENT
+						 |
+						 (Decrement) designator:DESIGN DECREMENT
+						 |
+						 (Method_call_0) designator:methodName LEFT_PARENTHESIS act_pars RIGHT_PARENTHESIS
+						 |
+						 (Method_call_1) designator:methodName LEFT_PARENTHESIS RIGHT_PARENTHESIS;
+						 
+						 
+assignment_operations ::=  (Assignment_operation_single) designator:DESIGN assign_op expr:EXPRESSION
+						   |
+						   (Assignment_operation_multi) list_of_addition_assignment;
+							
+							
+list_of_addition_assignment ::= (Assignment_addition_list) designator:DESIGN1 assign_op designator:DESIGN2 designator_add_op_assignment_list;
+								   
+designator_add_op_assignment_list ::= (Add_Op_Assignment_Designator_List) assign_op designator:DESIGN designator_add_op_assignment_list
+									  |
+									  (Add_Op_Assignment_Designator_Part) assign_op expr:EXPRESSION;
+									  
+									  		
+assign_op ::= (Assignment_operator) ASSIGNMENT
+			  |
+			  (Assignment_add_sub_op_right) add_op_right
+			  |
+			  (Assignment_mul_op_right) mul_op_right;
+			 				 
+					 
+expr ::= (Expr_neg_term_multi) MINUS term more_term_list
+		 |
+		 (Expr_neg_term_single) MINUS term
+		 |
+		 (Expr_term_multi) term more_term_list
+		 |
+		 (Expr_term_single) term
+		 |		 
+		 (Expr_error) error {: this.parser.report_error("Sintaksna greska - neispravan izraz", this.parser.getErrorSymbol()); :};
+		 
+more_term_list ::= (More_term_multi) more_term_list more_term_part
+				   |
+				   (More_term_single) more_term_part;	
+
+more_term_part ::= (More_term_part) add_op_left term;									 
+			
+term ::= (Term_multi) factor more_factor_list
+		 |
+		 (Term_single) factor;
+			
+more_factor_list ::= (More_factor_multi) more_factor_list more_factor_part
+					 |
+					 (More_factor_single) more_factor_part;	
+
+more_factor_part ::= (More_factor_part) mul_op_left factor;								
+
+factor ::= (Factor_num_const) NUM_CONST 
+		   | 
+		   (Factor_bool_const) BOOL_CONST
+		   | 
+		   (Factor_char_const) CHAR_CONST 
+		   | 
+		   (Factor_expr) LEFT_PARENTHESIS expr RIGHT_PARENTHESIS
+		   |
+		   (Factor_new) NEW type
+		   |		  
+		   (Factor_new_array) NEW type LEFT_SQUARE expr RIGHT_SQUARE
+		   |		   
+		   (Factor_meth_call_0) designator:methodName LEFT_PARENTHESIS act_pars RIGHT_PARENTHESIS
+		   |		   
+		   (Factor_meth_call_1) designator:methodName LEFT_PARENTHESIS RIGHT_PARENTHESIS   		  		   		  
+		   |
+		   (Factor_designator) designator:DESIGN;
+
+designator ::= (Designator_0) IDENT:ID LEFT_SQUARE expr RIGHT_SQUARE
+			   |
+			   (Designator_1) IDENT:ID;
+			   
+rel_op ::= (Rel_op_gt) GREATER
+		   |
+		   (Rel_op_eq) EQUAL
+		   |
+		   (Rel_op_lt) LESSER
+		   |
+		   (Rel_op_ge) GREATER_EQUAL
+		   |
+		   (Rel_op_le) LESSER_EQUAL
+		   |
+		   (Rel_op_ne) NOT_EQUAL;
+
+add_op ::= (Add_op_left_addop) add_op_left 
+		   | 
+		   (Add_op_right_addop) add_op_right;
+		   
+add_op_left ::= (Add_op_left_add) PLUS
+			  	|
+			  	(Add_op_left_sub) MINUS;
+			  	
+add_op_right ::= (Add_And_Assign_Right) ADDASSIGN
+			     |
+			     (Sub_And_Assign_Right) SUBASSIGN;	 	
+
+mul_op ::= (Mul_op_left_mulop) mul_op_left
+		   | 
+		   (Mul_op_right_mulop) mul_op_right;
+		   
+mul_op_left ::= (Multiplication) MULTIPLICATION
+				|
+				(Division) DIVISION
+				|
+				(Modulo) MODULO;
+				
+mul_op_right ::= (Mul_and_assign_right) MULASSIGN
+				 |
+				 (Div_and_assign_right) DIVASSIGN
+				 |
+				 (Mod_and_assign_right) MODASSIGN;
+
+

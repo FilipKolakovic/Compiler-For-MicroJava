@@ -1,0 +1,5 @@
+Project name: Compiler for MicroJava language
+
+Project description:
+-A fully functional compiler for a custom high-level Java-like programming language called MicroJava. 
+ The compiler contains lexical, syntax, semantical analysis, and code generation for virtual MicroJava
